@@ -1,0 +1,17 @@
+{
+  "name": "clear_node_module",
+  "version": "1.0.1",
+  "description": "This is a simple cli tool to remove node_modules in a directory or in directories",
+  "main": "index.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node ."
+  },
+  "bin": "./index.mjs",
+  "author": "lkcodes.netlify.app",
+  "license": "ISC",
+  "dependencies": {
+    "gradient-string": "^2.0.1",
+    "rimraf": "^3.0.2"
+  }
+}
