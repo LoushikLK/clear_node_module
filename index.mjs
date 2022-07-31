@@ -13,8 +13,6 @@ const errorGradient = gradient("#e31010", "#e31010");
 
 const successGradient = gradient("#42f548", "#42f548");
 
-const warningGradient = gradient("#e3b910", "#e3b910");
-
 inputInterface.question(
   gradient.pastel.multiline(
     "what is the directory name where node_module are located? \n"
@@ -68,7 +66,7 @@ const handleFindNodeFolder = async (source) => {
             }
           }
         } else {
-          console.log(warningGradient("No node_modules found in " + source));
+          console.log(successGradient("Checked " + source + " ✓✓ "));
         }
       }
     });
@@ -77,26 +75,27 @@ const handleFindNodeFolder = async (source) => {
   }
 };
 
-// const loaderAnimation = () => {
-//   var h = ["|", "/", "-", "\\"];
-//   let dots = [".", "..", "...", "...."];
-//   var i = 0;
+const loaderAnimation = () => {
+  var h = ["|", "/", "-", "\\"];
+  let dots = [".", "..", "...", "...."];
+  var i = 0;
 
-//   return setInterval(() => {
-//     i = i > 3 ? 0 : i;
-//     console.clear();
-//     console.log(h[i] + gradient.pastel.multiline(" Deleting" + dots[i]));
-//     i++;
-//   }, 300);
-// };
+  return setInterval(() => {
+    i = i > 3 ? 0 : i;
+    console.log(h[i] + gradient.pastel.multiline(" Deleting" + dots[i]));
+    i++;
+  }, 300);
+};
 
 const handleDeleteFolder = (pathToFolder) => {
   try {
+    let deletingAnimate = loaderAnimation();
     fs.rm(pathToFolder, { recursive: true, force: true }, (err) => {
       if (err) {
         console.log(errorGradient(err?.message));
       } else {
-        console.log(successGradient("Folder Deleted  ✓✓"));
+        clearInterval(deletingAnimate);
+        console.log(successGradient("Node_Modules Deleted  ✓✓"));
       }
     });
   } catch (error) {
