@@ -84,6 +84,7 @@ const loaderAnimation = () => {
     i = i > 3 ? 0 : i;
     console.log(h[i] + gradient.pastel.multiline(" Deleting" + dots[i]));
     i++;
+    return;
   }, 300);
 };
 
