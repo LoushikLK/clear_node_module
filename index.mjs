@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
+import fs, { readdir } from "fs";
 import gradient from "gradient-string";
 import readline from "readline";
-import fs, { readdir } from "fs";
 
 const inputInterface = readline.createInterface({
   input: process.stdin,
@@ -12,6 +12,8 @@ const inputInterface = readline.createInterface({
 const errorGradient = gradient("#e31010", "#e31010");
 
 const successGradient = gradient("#42f548", "#42f548");
+
+let time = Date.now();
 
 inputInterface.question(
   gradient.pastel.multiline(
@@ -44,36 +46,70 @@ inputInterface.question(
   }
 );
 
-const handleFindNodeFolder = async (source) => {
-  try {
-    readdir(source, { withFileTypes: true }, (err, files) => {
-      if (err) {
-        console.log(errorGradient(err?.message));
-      } else {
-        let data = files
-          .filter((dirent) => dirent.isDirectory())
-          .map((dirent) => dirent.name);
+const handleFindNodeFolder = async (source) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      resolve(
+        readdir(source, { withFileTypes: true }, (err, files) => {
+          if (err) {
+            console.log(errorGradient(err?.message));
+          } else {
+            let data = files
+              .filter((dirent) => dirent.isDirectory())
+              .map((dirent) => dirent.name);
 
-        // console.log(data);
+            // console.log(data);
 
-        if (data.length > 0) {
-          for (let i = 0; i < data.length; i++) {
-            if (data[i] === "node_modules") {
-              let dirPath = `${source}/${data[i]}`;
-              handleDeleteFolder(dirPath);
+            if (data.length > 0) {
+              for (let i = 0; i < data.length; i++) {
+                if (data[i] === "node_modules") {
+                  let dirPath = `${source}/${data[i]}`;
+                  handleDeleteFolder(dirPath);
+                } else {
+                  handleFindNodeFolder(`${source}/${data[i]}`);
+                }
+              }
             } else {
-              handleFindNodeFolder(`${source}/${data[i]}`);
+              console.log(successGradient("Checked " + source + " ✓✓ "));
             }
           }
-        } else {
-          console.log(successGradient("Checked " + source + " ✓✓ "));
-        }
-      }
-    });
-  } catch (error) {
-    console.log(errorGradient(error?.message));
-  }
-};
+        })
+      );
+    } catch (error) {
+      console.log(errorGradient(error?.message));
+    }
+  });
+
+// const handleFindNodeFolder = async (source) => {
+//   try {
+//     readdir(source, { withFileTypes: true }, (err, files) => {
+//       if (err) {
+//         console.log(errorGradient(err?.message));
+//       } else {
+//         let data = files
+//           .filter((dirent) => dirent.isDirectory())
+//           .map((dirent) => dirent.name);
+
+//         // console.log(data);
+
+//         if (data.length > 0) {
+//           for (let i = 0; i < data.length; i++) {
+//             if (data[i] === "node_modules") {
+//               let dirPath = `${source}/${data[i]}`;
+//               handleDeleteFolder(dirPath);
+//             } else {
+//               handleFindNodeFolder(`${source}/${data[i]}`);
+//             }
+//           }
+//         } else {
+//           console.log(successGradient("Checked " + source + " ✓✓ "));
+//         }
+//       }
+//     });
+//   } catch (error) {
+//     console.log(errorGradient(error?.message));
+//   }
+// };
 
 const loaderAnimation = () => {
   var h = ["|", "/", "-", "\\"];
@@ -83,23 +119,29 @@ const loaderAnimation = () => {
   return setInterval(() => {
     i = i > 3 ? 0 : i;
     console.log(h[i] + gradient.pastel.multiline(" Deleting" + dots[i]));
+    console.clear();
     i++;
     return;
   }, 300);
 };
 
-const handleDeleteFolder = (pathToFolder) => {
-  try {
-    let deletingAnimate = loaderAnimation();
-    fs.rm(pathToFolder, { recursive: true, force: true }, (err) => {
-      if (err) {
-        console.log(errorGradient(err?.message));
-      } else {
-        clearInterval(deletingAnimate);
-        console.log(successGradient("Node_Modules Deleted  ✓✓"));
-      }
-    });
-  } catch (error) {
-    console.log(errorGradient(error?.message));
-  }
-};
+const handleDeleteFolder = (pathToFolder) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      let deletingAnimate = loaderAnimation();
+
+      fs.rm(pathToFolder, { recursive: true, force: true }, (err) => {
+        if (err) {
+          console.log(errorGradient(err?.message));
+        } else {
+          clearInterval(deletingAnimate);
+          console.log(successGradient("Node_Modules Deleted  ✓✓"));
+          console.log(Date.now() - time + " ms");
+        }
+      });
+      resolve();
+    } catch (error) {
+      console.log(errorGradient(error?.message));
+      reject(error);
+    }
+  });

@@ -1,6 +1,6 @@
 {
-  "name": "remove_node_modules",
-  "version": "1.0.3",
+  "name": "rm-node-files",
+  "version": "1.0.5",
   "description": "This is a simple cli tool to remove node_modules in a directory or in directories",
   "main": "index.mjs",
   "type": "module",
